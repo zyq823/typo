@@ -172,4 +172,22 @@ class Feedback < Content
       errors.add(:article_id, 'Comment are closed')
     end
   end
+
+  def blog_id
+    set_blog_and_blog_id_from_article
+    super
+  end
+
+  def blog
+    set_blog_and_blog_id_from_article
+    super
+  end
+
+  private
+
+  def set_blog_and_blog_id_from_article
+    return if self.article.nil?
+    self[:blog] ||= self.article.blog
+    self[:blog_id] ||= self[:blog].id
+  end
 end

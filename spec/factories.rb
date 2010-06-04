@@ -27,6 +27,7 @@ Factory.define :article do |a|
   # Using an existing user avoids the password reminder mail overhead
   a.user { User.find(:first) }
   #a.association :user, :factory => :user
+  a.blog { Blog.find(:first) }
 end
 
 Factory.define :second_article, :parent => :article do |a|

@@ -102,5 +102,3 @@ if RAILS_ENV != 'test'
 end
 
 FLICKR_KEY='84f652422f05b96b29b9a960e0081c50'
-
-$blog_id_for = {}

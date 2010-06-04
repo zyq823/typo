@@ -93,7 +93,7 @@ class Admin::ContentController < Admin::BaseController
     # published article doesn't get overriden on the front
     if @article.published
       parent_id = @article.id
-      @article = Article.drafts.child_of(parent_id).first || Article.new
+      @article = Article.drafts.child_of(parent_id).first || this_blog.articles.build
       @article.allow_comments = this_blog.default_allow_comments
       @article.allow_pings    = this_blog.default_allow_pings
       @article.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
@@ -215,31 +215,16 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def get_or_build_article
-    @article = case params[:action]
-               when 'new'
+    @article = case params[:id]
+               when nil
                  returning(this_blog.articles.build) do |art|
                    art.allow_comments = this_blog.default_allow_comments
                    art.allow_pings    = this_blog.default_allow_pings
-                   art.published      = true
+                   art.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
                  end
-               when 'edit'
-                 this_blog.articles.find(params[:id])
                else
-                 raise "Don't know how to get article for action: #{params[:action]}"
+                 this_blog.articles.find(params[:id])
                end
-  end
-
-  def get_or_build_article
-    @article = case params[:id]
-             when nil
-               returning(Article.new) do |art|
-                 art.allow_comments = this_blog.default_allow_comments
-                 art.allow_pings    = this_blog.default_allow_pings
-                 art.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
-               end
-            else
-              Article.find(params[:id])
-            end
   end
 
   def setup_resources

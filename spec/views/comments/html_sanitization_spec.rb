@@ -2,11 +2,11 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe "CommentSanitization", :shared => true do
   before do
-    @article = mock_model(Article, :created_at => Time.now, :published_at => Time.now)
-    Article.stub!(:find).and_return(@article)
     @blog = mock_model(Blog, :use_gravatar => false)
     @blog.stub!(:lang).and_return('en_US')
     @controller.template.stub!(:this_blog).and_return(@blog)
+    @article = mock_model(Article, :created_at => Time.now, :published_at => Time.now, :blog => @blog)
+    Article.stub!(:find).and_return(@article)
 
     prepare_comment
 

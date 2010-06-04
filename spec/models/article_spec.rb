@@ -69,6 +69,7 @@ describe Article do
   it "test_create" do
     a = Article.new
     a.user_id = 1
+    a.blog = blogs(:default)
     a.body = "Foo"
     a.title = "Zzz"
     assert a.save
@@ -106,6 +107,7 @@ describe Article do
   it "test_html_title" do
     a = Article.new
     a.title = "This <i>is</i> a <b>test</b>"
+    a.blog = blogs(:default)
     assert a.save
 
     assert_equal 'this-is-a-test', a.permalink
@@ -114,6 +116,7 @@ describe Article do
   it "test_multibyte_title" do
     a = Article.new
     a.title = "ルビー"
+    a.blog = blogs(:default)
     assert a.save
 
     assert_equal '%E3%83%AB%E3%83%93%E3%83%BC', a.permalink
@@ -163,7 +166,7 @@ describe Article do
   end
 
   it "test_tags" do
-    a = Article.new(:title => 'Test tag article',
+    a = Article.new(:title => 'Test tag article', :blog_id => 1,
                     :keywords => 'test tag tag stuff');
 
     assert_kind_of Article, a
@@ -224,35 +227,35 @@ describe Article do
   end
 
   it "test_just_published_flag" do
-    art = Article.new(:title => 'title',
-                                   :body => 'body',
-                                   :published => true)
+    art = Article.new(:title => 'title', :blog_id  => 1,
+                      :body => 'body', :published => true)
     assert art.just_changed_published_status?
     assert art.save
 
     art = Article.find(art.id)
     assert !art.just_changed_published_status?
 
-    art = Article.create!(:title => 'title2',
-                          :body => 'body',
-                          :published => false)
+    art = Article.create!(:title => 'title2', :body => 'body',
+                          :blog_id => 1, :published => false)
 
     assert ! art.just_changed_published_status?
   end
 
   it "test_future_publishing" do
     assert_sets_trigger(Article.create!(:title => 'title', :body => 'body',
-                                        :published => true,
+                                        :published => true, :blog_id => 1,
                                         :published_at => Time.now + 4.seconds))
   end
 
   it "test_future_publishing_without_published_flag" do
     assert_sets_trigger Article.create!(:title => 'title', :body => 'body',
+                                        :blog_id => 1,
                                         :published_at => Time.now + 4.seconds)
   end
 
   it "test_triggers_are_dependent" do
     art = Article.create!(:title => 'title', :body => 'body',
+                          :blog_id => 1,
                           :published_at => Time.now + 1.hour)
     assert_equal 1, Trigger.count
     art.destroy
@@ -275,6 +278,7 @@ describe Article do
   it "test_find_published_by_category" do
     Article.create!(:title      => "News from the future!",
                     :body       => "The future is cool!",
+                    :blog_id    => 1,
                     :keywords   => "future",
                     :published_at => Time.now + 12.minutes)
 
@@ -304,7 +308,7 @@ describe Article do
     [:randomuser, :bob].each do |tag|
       u = users(tag); u.notify_on_new_articles = true; u.save!
     end
-    a = Article.new(:title => 'New Article', :body => 'Foo', :author => 'Tobi', :user => users(:tobi))
+    a = Article.new(:title => 'New Article', :body => 'Foo', :author => 'Tobi', :user => users(:tobi), :blog => blogs(:default))
     assert a.save
 
     assert_equal 2, a.notify_users.size

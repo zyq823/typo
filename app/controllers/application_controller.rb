@@ -53,11 +53,7 @@ class ApplicationController < ActionController::Base
 
   # Helper method to get the blog object.
   def this_blog
-    @blog ||= if $blog_id_for[blog_base_url]
-                Blog.find($blog_id_for[blog_base_url])
-              else
-                returning(Blog.find_blog(blog_base_url)) { |blog| $blog_id_for[blog_base_url] = blog.id }
-              end
+    @blog ||= Blog.find_blog(blog_base_url)
   end
 
   helper_method :this_blog
