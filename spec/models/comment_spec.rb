@@ -162,7 +162,7 @@ describe Comment do
     end
 
     it 'should becomes not published in article if withdraw' do
-      a = Article.new(:title => 'foo')
+      a = Article.new(:title => 'foo', :blog_id => blogs(:default).id)
       assert a.save
 
       assert_equal 0, a.published_comments.size
@@ -175,7 +175,7 @@ describe Comment do
       assert_equal 1, a.published_comments.size
       c.withdraw!
 
-      a = Article.new(:title => 'foo')
+      a = Article.new(:title => 'foo', :blog_id => 1)
       assert_equal 0, a.published_comments.size
     end
 

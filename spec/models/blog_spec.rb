@@ -67,8 +67,9 @@ describe "Given the first Blog fixture" do
       end
     end
   end
-  it "should be the only blog allowed" do
-    Blog.new.should_not be_valid
+
+  it "should allow another blog to be created" do
+    Blog.new.should be_valid
   end
 end
 

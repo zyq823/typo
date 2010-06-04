@@ -51,6 +51,7 @@ describe BackendController do
     assert_equal "<p>new post <strong>body</strong></p>", new_post.html(:body)
     assert_equal "textile", new_post.text_filter.name
     assert_equal users(:tobi), new_post.user
+    assert_equal this_blog.id, new_post.blog_id
     assert new_post.published?
     assert new_post[:published_at]
   end
@@ -75,6 +76,7 @@ describe BackendController do
     assert_equal "new post title", new_post.title
     assert_equal "new post body", new_post.body
     assert_equal [categories(:software), categories(:hardware)].sort_by(&:id), new_post.categories.sort_by { |c| c.id }
+    assert_equal this_blog.id, new_post.blog_id
     assert new_post.published?
   end
 
@@ -85,6 +87,7 @@ describe BackendController do
     assert_not_nil result
     new_post = Article.find(result)
     assert_equal [categories(:hardware)], new_post.categories
+    assert_equal this_blog.id, new_post.blog_id
   end
 
   it "test_blogger_fail_authentication" do
@@ -143,6 +146,7 @@ describe BackendController do
     assert_equal article.body, new_article.body
     assert_equal "<p>this is a <strong>test</strong></p>", new_article.html(:body)
     assert_equal article.published_at, new_article.published_at.utc
+    assert_equal this_blog.id, new_article.blog_id
   end
 
   # TODO: Work out what the correct response is when a post can't be saved...
@@ -180,6 +184,7 @@ describe BackendController do
     assert_equal article.extended, new_post.extended
     assert_equal "<p>extend me</p>", new_post.html(:extended)
     assert_equal article.published_at, new_post.published_at.utc
+    assert_equal this_blog.id, new_post.blog_id
   end
 
   it "test_meta_weblog_new_unpublished_post_with_blank_creation_date" do

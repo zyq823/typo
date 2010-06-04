@@ -1,6 +1,6 @@
 spam_comment:
   type: Comment
-  blog_id: 1
+  blog: default
   published: true
   article: article2
   author: Bob Foo
@@ -14,7 +14,7 @@ spam_comment:
 
 comment_article2_spam:
   type: Comment
-  blog_id: 1
+  blog: default
   published: true
   article: article2
   author: Bob Foo2
@@ -28,7 +28,7 @@ comment_article2_spam:
 
 comment2:
   type: Comment
-  blog_id: 1
+  blog: default
   published: true
   article: article1
   author: John Bar
@@ -44,7 +44,7 @@ comment2:
 
 comment3:
   type: Comment
-  blog_id: 1
+  blog: default
   published: false
   state: presumed_spam
   status_confirmed: false
@@ -58,7 +58,7 @@ comment3:
 
 trackback1:
   type: Trackback
-  blog_id: 1
+  blog: default
   article: article2
   published: false
   state: presumed_spam
@@ -74,7 +74,7 @@ trackback1:
 
 trackback2:
   type: Trackback
-  blog_id: 1
+  blog: default
   article: article1
   state: presumed_ham
   published: true
@@ -89,7 +89,7 @@ trackback2:
 
 trackback3:
   type: Trackback
-  blog_id: 1
+  blog: default
   article: article1
   published: true
   state: presumed_ham
@@ -104,7 +104,7 @@ trackback3:
 
 trackback4:
   type: Trackback
-  blog_id: 1
+  blog: default
   article: search_target
   published: true
   state: presumed_ham
@@ -119,7 +119,7 @@ trackback4:
 
 old_comment:
   type: Comment
-  blog_id: 1
+  blog: default
   article: inactive_article
   author: John Bar
   guid: b1i2n3g4o5t6i7v
@@ -134,7 +134,7 @@ old_comment:
 
 probably_spam_comment:
   type: Comment
-  blog_id: 1
+  blog: default
   published: false
   article: spammed_article
   author: Bob Foo
@@ -149,7 +149,7 @@ probably_spam_comment:
 
 definitely_spam_comment:
   type: Comment
-  blog_id: 1
+  blog: default
   published: false
   article: spammed_article
   author: Bob Foo
@@ -164,7 +164,7 @@ definitely_spam_comment:
 
 comment_on_publisher_article:
   type: Comment
-  blog_id: 1
+  blog: default
   published: true
   article: publisher_article
   author: Bob Foo
@@ -179,7 +179,7 @@ comment_on_publisher_article:
 
 comment_for_auto_link:
   type: Comment
-  blog_id: 1
+  blog: default
   published: true
   state: ham
   status_confirmed: true
