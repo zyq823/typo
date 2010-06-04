@@ -27,19 +27,19 @@ describe Trackback, 'With the various trackback filters loaded and DNS mocked ou
   it 'Trackbacks with a spammy link in the excerpt should be rejected' do
     IPSocket.should_receive(:getaddress).with('chinaaircatering.com.bsb.empty.us').at_least(:once).and_return('127.0.0.2')
 
-    tb = Trackback.new(ham_params.merge(:excerpt => '<a href="http://chinaaircatering.com">spam</a>'))
+    tb = @blog.trackbacks.build(ham_params.merge(:excerpt => '<a href="http://chinaaircatering.com">spam</a>'))
     tb.should be_spam
   end
 
   it 'Trackbacks with a spammy source url should be rejected' do
     add_spam_domain
-    tb = Trackback.new(ham_params.merge(:url => 'http://www.chinaircatering.com'))
+    tb = @blog.trackbacks.build(ham_params.merge(:url => 'http://www.chinaircatering.com'))
     tb.should be_spam
   end
 
   it 'Trackbacks from a spammy ip address should be rejected' do
     add_spam_ip('212.42.230.207')
-    tb = Trackback.new(ham_params.merge(:ip => '212.42.230.207'))
+    tb = @blog.trackbacks.build(ham_params.merge(:ip => '212.42.230.207'))
     tb.should be_spam
   end
 

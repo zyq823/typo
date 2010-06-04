@@ -153,6 +153,7 @@ describe BackendController do
   it "test_meta_weblog_new_post_fails" do
     @article = Article.new(:title => 'test', :body => 'body', :extended => 'extended',
                            :text_filter => TextFilter.find_by_name('textile'),
+                           :blog => blogs(:default),
                            :published_at => Time.now.utc.midnight)
     @article.errors.add_to_base('test error')
     @article.should_receive(:save).and_return(false)
@@ -165,6 +166,7 @@ describe BackendController do
 
   it "test_meta_weblog_new_post" do
     article = Article.new
+    article.blog = blogs(:default)
     article.title = "Posted via Test"
     article.body = "body"
     article.extended = "extend me"
@@ -203,6 +205,7 @@ describe BackendController do
   
   it "test_meta_weblog_edit_unpublished_post_with_old_creation_date" do
     article = Article.new
+    article.blog = blogs(:default)
     article.title = "Posted via Test"
     article.body = "body"
     article.extended = "extend me"
