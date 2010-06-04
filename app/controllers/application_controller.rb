@@ -53,15 +53,21 @@ class ApplicationController < ActionController::Base
 
   # Helper method to get the blog object.
   def this_blog
-    @blog ||= Blog.default
+    @blog ||= if $blog_id_for[blog_base_url]
+                Blog.find($blog_id_for[blog_base_url])
+              else
+                returning(Blog.find_blog(blog_base_url)) { |blog| $blog_id_for[blog_base_url] = blog.id }
+              end
   end
 
   helper_method :this_blog
 
   # The base URL for this request, calculated by looking up the URL for the main
-  # blog index page.
+  # blog index page.  This is matched with Blog#base_url to determine which Blog
+  # is supposed to handle this URL
   def blog_base_url
-    url_for(:controller => '/articles').gsub(%r{/$},'')
+    #url_for(:controller => '/articles').gsub(%r{/$},'')
+    url_for(:controller  => 'articles', :action => 'index').gsub(%r{/$},'')
   end
 
   def add_to_cookies(name, value, path=nil, expires=nil)
