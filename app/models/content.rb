@@ -72,7 +72,7 @@ class Content < ActiveRecord::Base
     else
       super(*args)
     end
-    set_default_blog
+    #set_default_blog
   end
 
   def invalidates_cache?(on_destruction = false)
