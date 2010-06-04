@@ -1,7 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 article1:
-  blog: default
+  blog_id: 1
   title: Article 1!
   body: body
   extended: "extended content"
@@ -22,7 +22,7 @@ article1:
 
 article2:
   type: Article
-  blog: default
+  blog_id: 1
   title: Article 2!
   body: body
   extended: extended content
@@ -42,7 +42,7 @@ article2:
 
 article3:
   type: Article
-  blog: default
+  blog_id: 1
   title: Article 3!
   body: body
   extended: extended content
@@ -60,7 +60,7 @@ article3:
 
 article4:
   type: Article
-  blog: default
+  blog_id: 1
   title: Article 4!
   body: I'm not "public":http://www.example.com/public!
   published: false
@@ -78,7 +78,7 @@ article4:
 
 first_page:
   type: Page
-  blog: default
+  blog_id: 1
   name: page_one
   title: Page One Title
   body: ho ho ho
@@ -91,7 +91,7 @@ first_page:
 
 another_page:
   type: Page
-  blog: default
+  blog_id: 1
   name: page/two
   title: Another Page Title
   body: another body for yet another page
@@ -104,7 +104,7 @@ another_page:
 
 markdown_page:
   type: Page
-  blog: default
+  blog_id: 1
   name: markdown-page
   title: Markdown Page
   text_filter: markdown_filter
@@ -118,7 +118,7 @@ markdown_page:
 
 inactive_article:
   type: Article
-  blog: default
+  blog_id: 1
   title: Inactive Article
   body: body
   extended: extended content
@@ -136,17 +136,17 @@ inactive_article:
 
 second_blog_article:
   type: Article
-  blog: second
+  blog_id: 2
   title: Second Blog Article
   body: body
   extended: extended content
   allow_comments: true
   allow_pings: true
   permalink: second-blog-article
-  created_at: 2004-04-01 12:00:00
-  updated_at: 2004-04-01 12:00:00
-  published_at: 2004-04-01 12:00:00
-  user_id: 1
+  created_at: 2004-04-01 12:00:01
+  updated_at: 2004-04-01 12:00:01
+  published_at: 2004-04-01 12:00:01
+  user: tobi
   author: Tobi
   guid: 2b1l0o6g4ar7
   published: true
@@ -154,7 +154,7 @@ second_blog_article:
 
 search_target:
   type: Article
-  blog: default
+  blog_id: 1
   title: Find me!
   body: search target
   extended: extended content
@@ -166,13 +166,13 @@ search_target:
   published_at: 2004-04-01 12:00:00
   user: tobi
   author: Tobi
-  guid: 2b1l0o6g4ar7
+  guid: 2b1l0o6g4ar8
   published: true
   state: published
 
 xmltest:
   type: Article
-  blog: default
+  blog_id: 1
   title: Associations aren't :dependent => true anymore
   body: originally seen on <a href="http://blog.rubyonrails.org/">blog.rubyonrails.org</a>
   extended: extended content
@@ -190,7 +190,7 @@ xmltest:
 
 markdown_article:
   type: Article
-  blog: default
+  blog_id: 1
   title: How made link with markdown
   body: "in markdown format\n\n * we\n * use\n [ok](http://blog.ok.com) to define a link"
   extended: extended content
@@ -209,7 +209,7 @@ markdown_article:
 
 spammed_article:
   type: Article
-  blog: default
+  blog_id: 1
   title: C'mon Spam Me!
   body: A bunch of innocuous content
   allow_comments: true
@@ -226,7 +226,7 @@ spammed_article:
 
 publisher_article:
   title: Article write by publisher
-  blog: default
+  blog_id: 1
   body: body
   extended: extended content
   created_at: 2004-06-02 20:00:03
@@ -245,7 +245,7 @@ publisher_article:
 
 utf8_article:
   title: ルビー
-  blog: default
+  blog_id: 1
   body: body
   extended: extended content
   created_at: 2004-06-02 20:00:04

@@ -56,8 +56,9 @@ class CommentsController < FeedbackController
     @comments = \
       if params[:article_id]
         Article.find(params[:article_id]).published_comments
+
       else
-        Comment.find_published(:all, this_blog.rss_limit_params.merge(:order => 'created_at DESC'))
+        this_blog.published_comments.find(:all, this_blog.rss_limit_params.merge(:order => 'created_at DESC'))
       end
   end
 

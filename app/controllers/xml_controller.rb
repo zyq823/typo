@@ -83,7 +83,7 @@ class XmlController < ApplicationController
 
   def fetch_items(association, order='published_at DESC', limit=nil)
     if association.instance_of?(Symbol)
-      association = association.to_s.singularize.classify.constantize
+      association = this_blog.send(association)
     end
     limit ||= this_blog.limit_rss_display
     @items += association.find_already_published(:all, :limit => limit, :order => order)

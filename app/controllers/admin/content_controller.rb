@@ -127,7 +127,7 @@ class Admin::ContentController < Admin::BaseController
 
   def do_add_or_remove_fu
     attrib, action = params[:action].split('_')
-    @article = Article.find(params[:id])
+    @article = this_blog.articles.find(params[:id])
     self.send("#{attrib}=", self.class.const_get(attrib.classify).find(params["#{attrib}_id"]))
     send("setup_#{attrib.pluralize}")
     @article.send(attrib.pluralize).send(real_action_for(action), send(attrib))
@@ -214,13 +214,19 @@ class Admin::ContentController < Admin::BaseController
     end
   end
 
-  def def_build_body
-    if @article.body =~ /<!--more-->/
-      body = @article.body.split('<!--more-->')
-      @article.body = body[0]
-      @article.extended = body[1]
-    end
-
+  def get_or_build_article
+    @article = case params[:action]
+               when 'new'
+                 returning(this_blog.articles.build) do |art|
+                   art.allow_comments = this_blog.default_allow_comments
+                   art.allow_pings    = this_blog.default_allow_pings
+                   art.published      = true
+                 end
+               when 'edit'
+                 this_blog.articles.find(params[:id])
+               else
+                 raise "Don't know how to get article for action: #{params[:action]}"
+               end
   end
 
   def get_or_build_article

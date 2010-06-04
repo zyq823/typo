@@ -321,27 +321,27 @@ describe ArticlesController, "redirecting" do
   end
 
   it 'should redirect to article' do
-    get :redirect, :from => ["articles", "2004", "04", "01", "second-blog-article"]
+    get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
     assert_response 301
-    assert_redirected_to "http://myblog.net/2004/04/01/second-blog-article"
+    assert_redirected_to "http://myblog.net/2004/04/01/search-target"
   end
 
   it 'should redirect to article with url_root' do
     b = blogs(:default)
     b.base_url = "http://test.host/blog"
     b.save
-    get :redirect, :from => ["articles", "2004", "04", "01", "second-blog-article"]
+    get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
     assert_response 301
-    assert_redirected_to "http://test.host/blog/2004/04/01/second-blog-article"
+    assert_redirected_to "http://test.host/blog/2004/04/01/search-target"
   end
 
   it 'should redirect to article when url_root is articles' do
     b = blogs(:default)
     b.base_url = "http://test.host/articles"
     b.save
-    get :redirect, :from => ["articles", "2004", "04", "01", "second-blog-article"]
+    get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
     assert_response 301
-    assert_redirected_to "http://test.host/articles/2004/04/01/second-blog-article"
+    assert_redirected_to "http://test.host/articles/2004/04/01/search-target"
   end
 
   it 'should redirect to article with articles in url_root' do
@@ -349,9 +349,9 @@ describe ArticlesController, "redirecting" do
     b.base_url = "http://test.host/aaa/articles/bbb"
     b.save
 
-    get :redirect, :from => ["articles", "2004", "04", "01", "second-blog-article"]
+    get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
     assert_response 301
-    assert_redirected_to "http://test.host/aaa/articles/bbb/2004/04/01/second-blog-article"
+    assert_redirected_to "http://test.host/aaa/articles/bbb/2004/04/01/search-target"
   end
 
   describe 'with permalink_format like %title%.html' do

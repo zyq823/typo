@@ -4,7 +4,7 @@ class Admin::FeedbackController < Admin::BaseController
   before_filter :only_own_feedback, :only => [:delete]
 
   def index
-    conditions = ['1 = 1', {}]
+    conditions = ['blog_id = :blog_id', {:blog_id => Blog.default.id}]
 
     if params[:search]
       conditions.first << ' and (url like :pattern or author like :pattern or title like :pattern or ip like :pattern or email like :pattern)'

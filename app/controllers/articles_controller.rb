@@ -147,7 +147,7 @@ class ArticlesController < ContentController
   ### Deprecated Actions ###
 
   def archives
-    @articles = Article.find_published
+    @articles = this_blog.published_articles
     @page_title = "#{_('Archives for')} #{this_blog.blog_name}"
     @keywords = (this_blog.meta_keywords.empty?) ? "" : this_blog.meta_keywords
     @description = "#{_('Archives for')} #{this_blog.blog_name} - #{this_blog.blog_subtitle}"

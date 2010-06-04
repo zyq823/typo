@@ -212,9 +212,10 @@ describe Article do
 
 
   it "test_find_published" do
+    # TODO: Useless
     @articles = Article.find_published
     assert_results_are(:search_target, :article1, :article2,
-                       :article3, :inactive_article,:xmltest,
+                       :article3, :inactive_article, :xmltest, :second_blog_article,
                        :spammed_article, :publisher_article, :markdown_article, :utf8_article)
 
     @articles = Article.find_published(:all,
@@ -396,7 +397,7 @@ describe Article do
       it_should_behave_like 'is an array'
 
       it 'should have one item' do
-        assert_equal 9, @articles.size
+        assert_equal 10, @articles.size
       end
     end
   end

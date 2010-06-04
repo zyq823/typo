@@ -1,5 +1,6 @@
 class Sidebar < ActiveRecord::Base
   serialize :config
+  belongs_to :blog
 
   class Field
     attr_accessor :key
@@ -185,10 +186,6 @@ class Sidebar < ActiveRecord::Base
     def available_sidebars
       Sidebar.subclasses.sort_by { |klass| klass.to_s }
     end
-  end
-
-  def blog
-    Blog.default
   end
 
   def initialize(*args)
