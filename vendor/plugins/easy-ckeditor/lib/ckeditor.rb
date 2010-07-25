@@ -12,7 +12,7 @@ module Ckeditor
   PLUGIN_CONTROLLER_PATH = "#{PLUGIN_PATH}/app/controllers"
   PLUGIN_VIEWS_PATH = "#{PLUGIN_PATH}/app/views"
   PLUGIN_HELPER_PATH = "#{PLUGIN_PATH}/app/helpers"
-  PLUGIN_FILE_MANAGER_URI = ''
+  PLUGIN_FILE_MANAGER_URI = '/fm/filemanager'
   PLUGIN_FILE_MANAGER_UPLOAD_URI = '/ckeditor/upload'
 
   module Helper
@@ -89,24 +89,5 @@ module Ckeditor
       "var oEditor = CKEDITOR.instances.#{id}.getData();"
 
     end
-  end
-end
-
-include ActionView
-module ActionView::Helpers::AssetTagHelper
-  alias_method :rails_javascript_include_tag, :javascript_include_tag
-
-  #  <%= javascript_include_tag :defaults, :ckeditor %>
-  def javascript_include_tag(*sources)
-    main_sources, application_source = [], []
-    if sources.include?(:ckeditor)
-      sources.delete(:ckeditor)
-      sources.push('ckeditor/ckeditor')
-    end
-    unless sources.empty?
-      main_sources = rails_javascript_include_tag(*sources).split("\n")
-      application_source = main_sources.pop if main_sources.last.include?('application.js')
-    end
-    [main_sources.join("\n"), application_source].join("\n")
   end
 end

@@ -3,6 +3,9 @@ ActionController::Routing::Routes.draw do |map|
   # default
   map.root :controller  => 'articles', :action => 'index'
 
+  # for Filemanager
+  map.connect 'fm/filemanager/:action/:id', :controller => 'Fm::Filemanager'
+
   # TODO: use only in archive sidebar. See how made other system
   map.articles_by_month ':year/:month', :controller => 'articles', :action => 'index', :year => /\d{4}/, :month => /\d{1,2}/
   map.articles_by_month_page ':year/:month/page/:page', :controller => 'articles', :action => 'index', :year => /\d{4}/, :month => /\d{1,2}/
@@ -42,7 +45,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect '/archives/', :controller => "articles", :action => "archives"
   map.connect '/setup', :controller => 'setup', :action => 'index'
   map.connect '/setup/confirm', :controller => 'setup', :action => 'confirm'
-  
+
   # I thinks it's useless. More investigating
   map.connect "trackbacks/:id/:day/:month/:year",
     :controller => 'trackbacks', :action => 'create', :conditions => {:method => :post}
@@ -87,6 +90,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.connect 'previews/:id', :controller => 'articles', :action => 'preview'
+  map.connect 'check_password', :controller => 'articles', :action => 'check_password'
 
   # Work around the Bad URI bug
   %w{ accounts backend files sidebar textfilter xml }.each do |i|

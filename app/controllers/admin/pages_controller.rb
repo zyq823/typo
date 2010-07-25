@@ -35,6 +35,7 @@ class Admin::PagesController < Admin::BaseController
     @page.blog = this_blog
     @page.user_id = current_user.id
     @page.text_filter ||= current_user.text_filter
+    @images = Resource.paginate :page => 1, :conditions => "mime LIKE '%image%'", :order => 'created_at DESC', :per_page => 10
     if request.post? 
       if @page.name.blank?
         @page.name = @page.title.tr(FROM, TO).gsub(/<[^>]*>/, '').to_url 
@@ -49,6 +50,7 @@ class Admin::PagesController < Admin::BaseController
 
   def edit
     @macros = TextFilter.available_filters.select { |filter| TextFilterPlugin::Macro > filter }
+    @images = Resource.paginate :page => 1, :conditions => "mime LIKE '%image%'", :order => 'created_at DESC', :per_page => 10
     @page = Page.find(params[:id])
     @page.attributes = params[:page]
     if request.post? and @page.save
