@@ -211,7 +211,7 @@ describe Article do
     keywords = ""
     (1..42).each { |tag| keywords << "tag#{tag}, " }
 
-    art = Article.create(:title => "Test article", :keywords => keywords)
+    art = Article.create(:title => "Test article", :keywords => keywords, :blog => blogs(:default))
     art.tags.size.should == 42
   end
 
