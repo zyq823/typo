@@ -13,12 +13,12 @@ class Admin::ContentController < Admin::BaseController
 
   def index
     @search = params[:search] ? params[:search] : {}
-    @articles = Article.search_no_draft_paginate(@search, :page => params[:page], :per_page => this_blog.admin_display_elements)
+    @articles = this_blog.articles.search_no_draft_paginate(@search, :page => params[:page], :per_page => this_blog.admin_display_elements)
 
     if request.xhr?
       render :partial => 'article_list', :object => @articles
     else
-      @article = Article.new(params[:article])
+      @article = this_blog.articles.new(params[:article])
     end
   end
 
@@ -27,7 +27,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def edit
-    @article = Article.find(params[:id])
+    @article = this_blog.articles.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'
       flash[:error] = _("Error, you are not allowed to perform this action")
@@ -37,7 +37,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def destroy
-    @article = Article.find(params[:id])
+    @article = this_blog.articles.find(params[:id])
 
     unless @article.access_by?(current_user)
       redirect_to :action => 'index'
@@ -92,7 +92,7 @@ class Admin::ContentController < Admin::BaseController
     # published article doesn't get overriden on the front
     if @article.published
       parent_id = @article.id
-      @article = Article.drafts.child_of(parent_id).first || this_blog.articles.build
+      @article = this_blog.articles.drafts.child_of(parent_id).first || this_blog.articles.build
       @article.allow_comments = this_blog.default_allow_comments
       @article.allow_pings    = this_blog.default_allow_pings
       @article.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
@@ -178,7 +178,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def destroy_the_draft
-    Article.all(:conditions => { :parent_id => @article.id }).map(&:destroy)
+    this_blog.articles.all(:conditions => { :parent_id => @article.id }).map(&:destroy)
   end
 
   def set_article_author
@@ -189,10 +189,10 @@ class Admin::ContentController < Admin::BaseController
 
   def set_article_title_for_autosave
     if @article.title.blank?
-      lastid = Article.find(:first, :order => 'id DESC').id
+      lastid = this_blog.articles.find(:first, :order => 'id DESC').id
       @article.title = "Draft article " + lastid.to_s
     end
-    unless @article.parent_id and Article.find(@article.parent_id).published
+    unless @article.parent_id and this_blog.articles.find(@article.parent_id).published
       @article.permalink = @article.stripped_title
     end
   end

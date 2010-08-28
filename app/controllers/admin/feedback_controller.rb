@@ -35,7 +35,7 @@ class Admin::FeedbackController < Admin::BaseController
   end
 
   def article
-    @article = Article.find(params[:id])
+    @article = this_blog.articles.find(params[:id])
     if params[:ham] && params[:spam].blank?
       @feedback = @article.comments.ham
     end
@@ -58,7 +58,7 @@ class Admin::FeedbackController < Admin::BaseController
   end
 
   def create
-    @article = Article.find(params[:article_id])
+    @article = this_blog.articles.find(params[:article_id])
     @comment = @article.comments.build(params[:comment])
     @comment.user_id = current_user.id
 

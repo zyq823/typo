@@ -4,7 +4,7 @@ class Admin::DashboardController < Admin::BaseController
   require 'rexml/document'
 
   def index
-    @newposts = Article.count(:all, :conditions => ['published = ? and published_at > ?', true, current_user.last_venue])
+    @newposts = this_blog.articles.count(:all, :conditions => ['published = ? and published_at > ?', true, current_user.last_venue])
     @newcomments = Feedback.count(:all, :conditions =>['state in (?,?) and published_at > ?', 'presumed_ham', 'ham', current_user.last_venue])
     comments
     lastposts
@@ -17,8 +17,8 @@ class Admin::DashboardController < Admin::BaseController
   private
 
   def statistics
-    @statposts = Article.count_published_articles
-    @statuserposts =  Article.count(:conditions => {:user_id => current_user.id, :state => 'published'})
+    @statposts = this_blog.articles.count_published_articles
+    @statuserposts =  this_blog.articles.count(:conditions => {:user_id => current_user.id, :state => 'published'})
     @statcomments = Comment.count(:all, :conditions => "state != 'spam'")
     @statspam = Comment.count(:all, :conditions => { :state => 'spam' })
   end
@@ -32,14 +32,14 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   def lastposts
-    @recent_posts = Article.find(:all,
+    @recent_posts = this_blog.articles.find(:all,
                                  :conditions => ["published = ?", true],
                                  :order => 'published_at DESC',
                                  :limit => 5)
   end
 
   def popular
-    @bestof = Article.find(:all,
+    @bestof = this_blog.articles.find(:all,
                            :select => 'contents.*, comment_counts.count AS comment_count',
                            :from => "contents, (SELECT feedback.article_id AS article_id, COUNT(feedback.id) as count FROM feedback WHERE feedback.state IN ('presumed_ham', 'ham') GROUP BY feedback.article_id ORDER BY count DESC LIMIT 9) AS comment_counts",
                            :conditions => ['comment_counts.article_id = contents.id AND published = ?', true],

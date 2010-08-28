@@ -8,7 +8,7 @@ class ContentController < ApplicationController
 
     def after(controller)
        future_article =
-         Article.find(:first,
+         this_blog.articles.find(:first,
                       :conditions => ['published = ? AND published_at > ?', true, @request_time],
                       :order =>  "published_at ASC" )
        if future_article

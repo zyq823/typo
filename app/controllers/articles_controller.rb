@@ -21,10 +21,10 @@ class ArticlesController < ContentController
 
     unless params[:year].blank?
       @noindex = 1
-      @articles = Article.paginate :page => params[:page], :conditions => { :published_at => time_delta(*params.values_at(:year, :month, :day)), :published => true }, :order => 'published_at DESC', :per_page => @limit
+      @articles = this_blog.articles.paginate :page => params[:page], :conditions => { :published_at => time_delta(*params.values_at(:year, :month, :day)), :published => true }, :order => 'published_at DESC', :per_page => @limit
     else
       @noindex = 1 unless params[:page].blank?
-      @articles = Article.paginate :page => params[:page], :conditions => ['published = ? AND published_at < ?', true, Time.now], :order => 'published_at DESC', :per_page => @limit
+      @articles = this_blog.articles.paginate :page => params[:page], :conditions => ['published = ? AND published_at < ?', true, Time.now], :order => 'published_at DESC', :per_page => @limit
     end
 
     @page_title = index_title
@@ -55,18 +55,18 @@ class ArticlesController < ContentController
 
   def live_search
     @search = params[:q]
-    @articles = Article.search(@search)
+    @articles = this_blog.articles.search(@search)
     render :layout => false, :action => :live_search
   end
 
   def preview
-    @article = Article.last_draft(params[:id])
+    @article = this_blog.articles.last_draft(params[:id])
     render :action => 'read'
   end
 
   def check_password
     return unless request.xhr?
-    @article = Article.find(params[:article][:id])
+    @article = this_blog.articles.find(params[:article][:id])
     if @article.password == params[:article][:password]
       render :partial => 'articles/article_content'
     else
