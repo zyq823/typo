@@ -368,6 +368,8 @@ describe ArticlesController, "redirecting" do
       assert_response 301
       assert_redirected_to "http://test.host/aaa/articles/bbb/2004/04/01/search-target"
     end
+
+    it 'should not redirect to an article from another blog'
   end
 
   describe 'with permalink_format like %title%.html' do
