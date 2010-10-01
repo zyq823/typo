@@ -5,7 +5,7 @@ class Feedback < Content
 
   include TypoGuid
 
-  validate_on_create :feedback_not_closed
+  validate :feedback_not_closed, :on => :create
 
   before_create :create_guid, :article_allows_this_feedback
   before_save :correct_url
@@ -55,7 +55,8 @@ class Feedback < Content
 
   def correct_url
     return if url.blank?
-    returning(url) do
+    # FIXME: This doesn't seem to do anything!
+    url.tap do
       url.to_s.gsub!(%r{^(?:http://)?(.+)},"http://\\1")
     end
   end

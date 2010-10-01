@@ -1,6 +1,6 @@
 class EmailNotify
   def self.logger
-    @@logger ||= RAILS_DEFAULT_LOGGER || Logger.new(STDOUT)
+    @@logger ||= ::Rails.logger || Logger.new(STDOUT)
   end
 
   def self.send_comment(comment, user)
@@ -27,6 +27,6 @@ class EmailNotify
 
   def self.send_message(user, email)
     email.content_type = "text/html; charset=utf-8"
-    NotificationMailer.deliver(email)
+    email.deliver
   end
 end

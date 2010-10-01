@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require 'spec_helper'
 
 describe Admin::CategoriesController do
-  integrate_views
+  render_views
 
   before do
     request.session = { :user => users(:tobi).id }
@@ -10,22 +10,22 @@ describe Admin::CategoriesController do
   it "test_index" do
     get :index
     assert_template 'index'
-    assert_template_has 'categories'
+    assigns(:categories).should_not be_nil
     assert_tag :tag => "div",
       :attributes => { :id => "category_container" }
   end
 
   it "test_create" do
-    assert_difference 'Category.count' do
+    lambda do
       post :edit, 'category' => { :name => "test category" }
       assert_response :redirect, :action => 'index'
-    end
+    end.should change(Category, :count)
   end
 
   it "test_edit" do
     get :edit, :id => Factory(:category).id
     assert_template 'new'
-    assert_template_has 'category'
+    assigns(:category).should_not be_nil
     assert assigns(:category).valid?
   end
 

@@ -1,10 +1,9 @@
 ActionController::Routing::Routes.draw do |map|
 
-  # default
-  map.root :controller  => 'articles', :action => 'index'
-
-  # for Filemanager
+  # for CK Editor
   map.connect 'fm/filemanager/:action/:id', :controller => 'Fm::Filemanager'
+  map.connect 'ckeditor/command', :controller => 'ckeditor', :action => 'command'
+  map.connect 'ckeditor/upload', :controller => 'ckeditor', :action => 'upload'
 
   # TODO: use only in archive sidebar. See how made other system
   map.articles_by_month ':year/:month', :controller => 'articles', :action => 'index', :year => /\d{4}/, :month => /\d{1,2}/
@@ -30,8 +29,8 @@ ActionController::Routing::Routes.draw do |map|
       action.xml 'rss', :type => 'feed', :format => 'rss'
       action.xml 'sitemap.xml', :format => 'googlesitemap', :type => 'sitemap', :path_prefix => nil
       action.xml ':format/feed.xml', :type => 'feed'
-      action.xml ':format/:type/feed.xml'
       action.xml ':format/:type/:id/feed.xml'
+      action.xml ':format/:type/feed.xml'
     end
   end
 
@@ -40,6 +39,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :trackbacks
 
   map.live_search_articles '/live_search/', :controller => "articles", :action => "live_search"
+  map.search '/search/:q.:format/page/:page', :controller => "articles", :action => "search"
   map.search '/search/:q.:format', :controller => "articles", :action => "search"
   map.search_base '/search/', :controller => "articles", :action => "search"
   map.connect '/archives/', :controller => "articles", :action => "archives"
@@ -63,8 +63,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect '/tag/:id/page/:page', :controller => 'tags', :action => 'show'
   map.connect '/tags/page/:page', :controller => 'tags', :action => 'index'
 
-  map.connect '/author/:id', :controller => 'authors', :action => 'show'
   map.xml '/author/:id.:format', :controller => 'authors', :action => 'show', :format => /rss|atom/
+  map.connect '/author/:id', :controller => 'authors', :action => 'show'
 
   # allow neat perma urls
   map.connect 'page/:page',
@@ -105,19 +105,22 @@ ActionController::Routing::Routes.draw do |map|
     map.connect "/admin/#{i}/:action/:id", :controller => "admin/#{i}", :action => nil, :id => nil
   end
 
+  # default
+  map.root :controller  => 'articles', :action => 'index'
+
   map.connect '*from', :controller => 'articles', :action => 'redirect'
 
   map.connect(':controller/:action/:id') do |default_route|
     class << default_route
       def recognize_with_deprecation(path, environment = {})
-        RAILS_DEFAULT_LOGGER.info "#{path} hit the default_route buffer"
+        ::Rails.logger.info "#{path} hit the default_route buffer"
         recognize_without_deprecation(path, environment)
       end
       alias_method_chain :recognize, :deprecation
 
       def generate_with_deprecation(options, hash, expire_on = {})
-        RAILS_DEFAULT_LOGGER.info "generate(#{options.inspect}, #{hash.inspect}, #{expire_on.inspect}) reached the default route"
-        #         if RAILS_ENV == 'test'
+        ::Rails.logger.info "generate(#{options.inspect}, #{hash.inspect}, #{expire_on.inspect}) reached the default route"
+        #         if ::Rails.env == 'test'
         #           raise "Don't rely on default route generation"
         #         end
         generate_without_deprecation(options, hash, expire_on)

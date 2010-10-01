@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe Tag do
   it 'we can Tag.get by name' do
@@ -48,8 +48,11 @@ describe Tag do
     tags.last.article_counter.should == 2
   end
 
-  it 'permalink_url should be of form /tag/<name>' do
-    Tag.get('foo').permalink_url.should == 'http://myblog.net/tag/foo'
+  describe 'permalink_url' do
+    subject { Tag.get('foo').permalink_url }
+    it 'should be of form /tag/<name>' do
+      should == 'http://myblog.net/tag/foo'
+    end
   end
 end
 

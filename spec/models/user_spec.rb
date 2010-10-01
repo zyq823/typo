@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe User do
   describe 'Factory Girl' do
@@ -194,5 +194,10 @@ describe User do
       users(:user_publisher).should_not be_admin
     end
 
+  end
+
+  describe '#permalink_url' do
+    subject { users(:tobi).permalink_url }
+    it { should == 'http://myblog.net/users/show/tobi' }
   end
 end

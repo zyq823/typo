@@ -1,16 +1,3 @@
-# BlogRequest is a fake Request object, created so blog.url_for will work.
-class BlogRequest
-
-  attr_accessor :protocol, :host_with_port, :path, :symbolized_path_parameters
-
-  def initialize(prot, host)
-    @protocol = prot
-    @host_with_port = host
-    @path = ''
-    @symbolized_path_parameters = {}
-  end
-end
-
 # The Blog class represents the one and only blog.  It stores most
 # configuration settings and is linked to most of the assorted content
 # classes via has_many.
@@ -21,6 +8,7 @@ end
 class Blog < ActiveRecord::Base
   include ConfigManager
   extend ActiveSupport::Memoizable
+  include Rails.application.routes.url_helpers
 
   has_many :contents
   has_many :trackbacks
@@ -162,12 +150,11 @@ class Blog < ActiveRecord::Base
   #
   # It also caches the result in the RouteCache, so repeated URL generation
   # requests should be fast, as they bypass all of Rails' route logic.
-  def url_for(options = {}, extra_params = {})
-    @request ||= BlogRequest.new(protocol, host_with_port)
+  def url_for_with_base_url(options = {}, extra_params = {})
     case options
     when String
       if extra_params[:only_path]
-        url_generated = relative_url_root
+        url_generated = root_path
       else
         url_generated = base_url
       end
@@ -177,16 +164,11 @@ class Blog < ActiveRecord::Base
     when Hash
       unless RouteCache[options]
         options.reverse_merge!(:only_path => false, :controller => '',
-                               :action => 'permalink')
-        @url ||= ActionController::UrlRewriter.new(@request, {})
-        if ActionController::Base.relative_url_root.nil?
-          old_relative_url = nil
-        else
-          old_relative_url = ActionController::Base.relative_url_root.dup
-        end
-        ActionController::Base.relative_url_root = relative_url_root
-        RouteCache[options] = @url.rewrite(options)
-        ActionController::Base.relative_url_root = old_relative_url
+                               :action => 'permalink',
+                               :host => host_with_port,
+                               :script_name => root_path)
+
+        RouteCache[options] = url_for_without_base_url(options)
       end
 
       return RouteCache[options]
@@ -194,6 +176,8 @@ class Blog < ActiveRecord::Base
       raise "Invalid URL in url_for: #{options.inspect}"
     end
   end
+
+  alias_method_chain :url_for, :base_url
 
   # The URL for a static file.
   def file_url(filename)
@@ -226,11 +210,11 @@ class Blog < ActiveRecord::Base
     end
   end
 
-  private
-
-  def relative_url_root
-    split_base_url[:relative_url_root]
+  def root_path
+    split_base_url[:root_path]
   end
+
+  private
 
   def protocol
     split_base_url[:protocol]
@@ -246,7 +230,7 @@ class Blog < ActiveRecord::Base
         raise "Invalid base_url: #{self.base_url}"
       end
       @split_base_url = { :protocol => $1, :host_with_port => $2,
-        :relative_url_root => $3.gsub(%r{/$},'') }
+        :root_path => $3.gsub(%r{/$},'') }
     end
     @split_base_url
   end

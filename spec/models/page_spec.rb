@@ -1,12 +1,13 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe 'Given the fixture :first_page' do
   before(:each) do
     @page = contents(:first_page)
   end
 
-  it '#permalink_url should be: http://myblog.net/pages/page_one' do
-    @page.permalink_url.should == 'http://myblog.net/pages/page_one'
+  describe "#permalink_url" do
+    subject { @page.permalink_url }
+    it { should == 'http://myblog.net/pages/page_one' }
   end
 
   it '#edit_url should be: http://myblog.net/admin/pages/edit/<page_id>' do
@@ -33,14 +34,10 @@ class Hash
   end
 end
 
-describe "ValidPageHelper", :shared => true do
+describe 'Given no pages' do
   def valid_attributes
     { :name => 'name', :title => 'title', :body => 'body', :blog => blogs(:default)}
   end
-end
-
-describe 'Given no pages' do
-  it_should_behave_like "ValidPageHelper"
 
   before(:each) do
     Page.delete_all
@@ -82,8 +79,6 @@ describe 'Given no pages' do
 end
 
 describe 'Given a valid page' do
-  it_should_behave_like "ValidPageHelper"
-
   it 'default filter should be fetched from the blog' do
     blog = mock_model(Blog)
     Blog.stub!(:find).and_return(blog)

@@ -74,7 +74,7 @@ class User < ActiveRecord::Base
   end
 
   def self.find_by_permalink(permalink)
-    returning(self.find_by_login(permalink)) do |user|
+    self.find_by_login(permalink).tap do |user|
       raise ActiveRecord::RecordNotFound unless user
     end
   end
@@ -199,8 +199,8 @@ class User < ActiveRecord::Base
   # Send a mail of creation user to the user create
   def send_create_notification
     begin
-      email_notification = NotificationMailer.create_notif_user(self)
-      EmailNotify.send_message(self,email_notification)
+      email_notification = NotificationMailer.notif_user(self)
+      EmailNotify.send_message(self, email_notification)
     rescue => err
       logger.error "Unable to send notification of create user email: #{err.inspect}"
     end

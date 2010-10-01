@@ -1,10 +1,4 @@
 module Admin::ContentHelper
-  include ArticlesHelper
-
-  def contents
-    [@article]
-  end
-
   def params_qsa
     { 'search[category]' => @search[:category],
       'search[user_id]' => @search[:user_id],
@@ -12,7 +6,7 @@ module Admin::ContentHelper
       'searched[published]' => @search[:published] }
   end
 
-  def link_to_destroy_draft(record, controller = @controller.controller_name)
+  def link_to_destroy_draft(record, controller = controller.controller_name)
     if record.state.to_s == "Draft"
       link_to(_("Destroy this draft"),
         { :controller => controller, :action => 'destroy', :id => record.id },
@@ -23,7 +17,7 @@ module Admin::ContentHelper
   def auto_complete_result(entries, field, phrase = nil)
     return unless entries
     items = entries.map { |entry| content_tag("li", phrase ? highlight(entry[field], phrase) : h(entry[field])) }
-    content_tag("ul", items.uniq)
+    content_tag("ul", items.uniq.join.html_safe)
   end
 
   def auto_complete_field(field_id, options = {})

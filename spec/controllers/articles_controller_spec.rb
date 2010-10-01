@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ArticlesController do
-  integrate_views
+  render_views
 
   it "should redirect category to /categories" do
     get 'category'
@@ -27,11 +27,11 @@ describe ArticlesController do
     end
 
     it 'should have good link feed rss' do
-      response.should have_tag('head>link[href=?]','http://test.host/articles.rss')
+      response.should have_selector('head>link[href="http://test.host/articles.rss"]')
     end
 
     it 'should have good link feed atom' do
-      response.should have_tag('head>link[href=?]','http://test.host/articles.atom')
+      response.should have_selector('head>link[href="http://test.host/articles.atom"]')
     end
   end
 
@@ -51,15 +51,17 @@ describe ArticlesController do
       end
 
       it 'should have good feed rss link' do
-        response.should have_tag('head>link[href=?]','http://test.host/search/a.rss')
+        response.should have_selector('head>link[href="http://test.host/search/a.rss"]')
       end
 
       it 'should have good feed atom link' do
-        response.should have_tag('head>link[href=?]','http://test.host/search/a.atom')
+        response.should have_selector('head>link[href="http://test.host/search/a.atom"]')
       end
 
       it 'should have content markdown interpret and without html tag' do
-        response.should have_tag('div', /in markdown format\n\n\nwe\nuse\nok to define a link\n\n...\n/)
+        response.should have_selector('div') do |div|
+          div.should contain(/in markdown format\n\n\nwe\nuse\nok to define a link\n\n...\n/)
+        end
       end
 
     end
@@ -80,7 +82,7 @@ describe ArticlesController do
 
     it 'search with empty result' do
       get 'search', :q => 'abcdefghijklmnopqrstuvwxyz'
-      response.should render_template('articles/error.html.erb')
+      response.should render_template('articles/error')
       assigns[:articles].should be_empty
     end
   end
@@ -102,20 +104,20 @@ describe ArticlesController do
       end
 
       it 'should render without layout' do
-        controller.should_receive(:render).with(:layout =>false, :action => :live_search)
-        get :live_search, :q => 'hello world'
+        pending "Release of fix for Rails ticket #5247 (should be in Rails 3.0.1"
+        response.should render_template(:layout => nil)
       end
 
       it 'should render template live_search' do
-        response.should render_template(:live_search)
+        response.should render_template('live_search')
       end
 
       it 'should not have h3 tag' do
-        response.should have_tag("h3")
+        response.should have_selector("h3")
       end
 
       it "should assign @search the search string" do
-        assigns[:search].should be_equal(params[:q])
+        assigns[:search].should be_equal(controller.params[:q])
       end
 
     end
@@ -173,7 +175,7 @@ describe ArticlesController, "nousers" do
 end
 
 describe ArticlesController, "feeds" do
-  integrate_views
+  render_views
 
   specify "/articles.atom => an atom feed" do
     get 'index', :format => 'atom'
@@ -186,7 +188,7 @@ describe ArticlesController, "feeds" do
     get 'index', :format => 'rss'
     response.should be_success
     response.should render_template("_rss20_feed")
-    response.should have_tag('link', 'http://myblog.net')
+    response.body.should have_selector('link', :content => 'http://myblog.net')
     assert_feedvalidator response.body
   end
 
@@ -221,6 +223,7 @@ end
 
 describe ArticlesController, "the index" do
   it "should ignore the HTTP Accept: header" do
+    pending "replacement needed for setting use_accept_header=false"
     request.env["HTTP_ACCEPT"] = "application/atom+xml"
     get "index"
     response.should_not render_template("_atom_feed")
@@ -228,7 +231,7 @@ describe ArticlesController, "the index" do
 end
 
 describe ArticlesController, "previewing" do
-  integrate_views
+  render_views
 
   describe 'with non logged user' do
     before :each do
@@ -251,7 +254,7 @@ describe ArticlesController, "previewing" do
       it "should render template #{view_path}/articles/read" do
         this_blog.theme = theme if theme
         get :preview, :id => @article.id
-        response.should render_template('articles/read.html.erb')
+        response.should render_template('articles/read')
       end
     end
 
@@ -269,10 +272,6 @@ describe ArticlesController, "previewing" do
 end
 
 describe ArticlesController, "redirecting" do
-  before do
-    ActionController::Base.relative_url_root = nil # avoid failures if environment.rb defines a relative URL root
-  end
-
   it 'should split routing path' do
     assert_routing "foo/bar/baz", {
       :from => ["foo", "bar", "baz"],
@@ -299,7 +298,7 @@ describe ArticlesController, "redirecting" do
       Factory(:redirect)
       get :redirect, :from => ["foo", "bar"]
       assert_response 301
-      assert_redirected_to "http://test.host/someplace/else"
+      response.should redirect_to("http://test.host/someplace/else")
     end
 
     it 'should not redirect from unknown URL' do
@@ -308,23 +307,32 @@ describe ArticlesController, "redirecting" do
       assert_response 404
     end
 
+    # FIXME: Due to the changes in Rails 3 (no relative_url_root), this
+    # does not work anymore when the accessed URL does not match the blog's
+    # base_url at least partly. Do we still want to allow acces to the blog
+    # through non-standard URLs? What was the original purpose of these
+    # redirects?
     describe 'and non-empty relative_url_root' do
       before do
-	ActionController::Base.relative_url_root = "/blog"
+	b = blogs(:default)
+	b.base_url = "http://test.host/blog"
+	b.save
+	# XXX: The following has no effect anymore.
+	# request.env["SCRIPT_NAME"] = "/blog"
       end
 
       it 'should redirect' do
-	Factory(:redirect, :from_path => 'foo/bar')
+	Factory(:redirect, :from_path => 'foo/bar', :to_path => '/someplace/else')
 	get :redirect, :from => ["foo", "bar"]
 	assert_response 301
-	assert_redirected_to "http://test.host/blog/someplace/else"
+	response.should redirect_to("http://test.host/blog/someplace/else")
       end
 
       it 'should redirect if to_path includes relative_url_root' do
 	Factory(:redirect, :from_path => 'bar/foo', :to_path => '/blog/someplace/else')
 	get :redirect, :from => ["bar", "foo"]
 	assert_response 301
-	assert_redirected_to "http://test.host/blog/someplace/else"
+	response.should redirect_to("http://test.host/blog/someplace/else")
       end
     end
   end
@@ -338,7 +346,7 @@ describe ArticlesController, "redirecting" do
     it 'should redirect to article' do
       get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://myblog.net/2004/04/01/search-target"
+      response.should redirect_to("http://myblog.net/2004/04/01/search-target")
     end
 
     it 'should redirect to article with url_root' do
@@ -347,7 +355,7 @@ describe ArticlesController, "redirecting" do
       b.save
       get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://test.host/blog/2004/04/01/search-target"
+      response.should redirect_to("http://test.host/blog/2004/04/01/search-target")
     end
 
     it 'should redirect to article when url_root is articles' do
@@ -356,7 +364,7 @@ describe ArticlesController, "redirecting" do
       b.save
       get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://test.host/articles/2004/04/01/search-target"
+      response.should redirect_to("http://test.host/articles/2004/04/01/search-target")
     end
 
     it 'should redirect to article with articles in url_root' do
@@ -366,14 +374,14 @@ describe ArticlesController, "redirecting" do
 
       get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://test.host/aaa/articles/bbb/2004/04/01/search-target"
+      response.should redirect_to("http://test.host/aaa/articles/bbb/2004/04/01/search-target")
     end
 
     it 'should not redirect to an article from another blog'
   end
 
   describe 'with permalink_format like %title%.html' do
-    integrate_views
+    render_views
 
     before(:each) do
       b = blogs(:default)
@@ -384,25 +392,25 @@ describe ArticlesController, "redirecting" do
     it 'should redirect from default URL format' do
       get :redirect, :from => ["2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://myblog.net/search-target.html"
+      response.should redirect_to("http://myblog.net/search-target.html")
     end
 
     it 'should redirect from old-style URL format with "articles" part' do
       get :redirect, :from => ["articles", "2004", "04", "01", "search-target"]
       assert_response 301
-      assert_redirected_to "http://myblog.net/search-target.html"
+      response.should redirect_to("http://myblog.net/search-target.html")
     end
 
     describe 'render article' do
 
-      integrate_views
+      render_views
 
       before(:each) do
 	get :redirect, :from => ["#{contents(:article1).permalink}.html"]
       end
 
       it 'should render template read to article' do
-	response.should render_template('articles/read.html.erb')
+	response.should render_template('articles/read')
       end
 
       it 'should assign article1 to @article' do
@@ -410,11 +418,11 @@ describe ArticlesController, "redirecting" do
       end
 
       it 'should have good rss feed link' do
-	response.should have_tag('head>link[href=?]', "http://myblog.net/#{contents(:article1).permalink}.html.rss")
+	response.should have_selector("head>link[href=\"http://myblog.net/#{contents(:article1).permalink}.html.rss\"]")
       end
 
       it 'should have good atom feed link' do
-	response.should have_tag('head>link[href=?]', "http://myblog.net/#{contents(:article1).permalink}.html.atom")
+	response.should have_selector("head>link[href=\"http://myblog.net/#{contents(:article1).permalink}.html.atom\"]")
       end
 
     end
@@ -425,7 +433,7 @@ describe ArticlesController, "redirecting" do
       end
 
       it 'should render atom partial' do
-	response.should render_template('articles/_atom_feed.atom.builder')
+	response.should render_template('articles/_atom_feed')
       end
 
       it 'should render a valid feed' do
@@ -439,7 +447,7 @@ describe ArticlesController, "redirecting" do
       end
 
       it 'should render rss20 partial' do
-	response.should render_template('articles/_rss20_feed.rss.builder')
+	response.should render_template('articles/_rss20_feed')
       end
 
       it 'should render a valid feed' do
@@ -464,7 +472,7 @@ describe ArticlesController, "redirecting" do
 end
 
 describe ArticlesController, "password protected" do
-  integrate_views
+  render_views
 
   before(:each) do
     b = blogs(:default)

@@ -140,7 +140,7 @@ class MetaWeblogService < TypoWebService
       end
     end
 
-    RAILS_DEFAULT_LOGGER.info(struct['mt_tb_ping_urls'])
+    ::Rails.logger.info(struct['mt_tb_ping_urls'])
     article.save
     true
   end

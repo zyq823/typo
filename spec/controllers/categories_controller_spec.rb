@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe CategoriesController, "/index" do
   def do_get
@@ -19,8 +19,7 @@ describe CategoriesController, "/index" do
   end
 
   it "should fall back to articles/groupings" do
-    controller.should_receive(:template_exists?) \
-      .with() \
+    controller.stub!(:template_exists?) \
       .and_return(false)
     do_get
     response.should render_template('articles/groupings')
@@ -62,12 +61,10 @@ describe CategoriesController, '/articles/category/personal' do
   end
 
   it 'should fall back to rendering articles/index' do
-    controller.should_receive(:template_exists?) \
-      .with() \
-      .and_raise(ActiveRecord::RecordNotFound)
-    lambda do
-      do_get
-    end.should raise_error(ActiveRecord::RecordNotFound)
+    controller.stub!(:template_exists?) \
+      .and_return(false)
+    do_get
+    response.should render_template('articles/index')
   end
 
   it 'should show only published articles' do
@@ -102,13 +99,13 @@ describe CategoriesController, 'empty category life-on-mars' do
   it 'should redirect to home when the category is empty' do
     Factory(:category, :permalink => 'life-on-mars')
     get 'show', :id => 'life-on-mars'
-    response.status.should == "301 Moved Permanently"
+    response.status.should == 301
     response.should redirect_to(Blog.default.base_url)
   end
 end
 
 describe CategoriesController, "password protected article" do
-  integrate_views
+  render_views
 
   it 'should be password protected when shown in category' do
     cat = Factory(:category, :permalink => 'personal', :name => 'Personal')

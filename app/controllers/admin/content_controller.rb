@@ -8,7 +8,7 @@ class Admin::ContentController < Admin::BaseController
 
   def auto_complete_for_article_keywords
     @items = Tag.find_with_char params[:article][:keywords].strip
-    render :inline => "<%= auto_complete_result @items, 'name' %>"
+    render :inline => "<%= raw auto_complete_result @items, 'name' %>"
   end
 
   def index
@@ -16,7 +16,7 @@ class Admin::ContentController < Admin::BaseController
     @articles = this_blog.articles.search_no_draft_paginate(@search, :page => params[:page], :per_page => this_blog.admin_display_elements)
 
     if request.xhr?
-      render :partial => 'article_list', :object => @articles
+      render :partial => 'article_list', :locals => { :articles => @articles }
     else
       @article = this_blog.articles.new(params[:article])
     end
@@ -216,15 +216,14 @@ class Admin::ContentController < Admin::BaseController
 
   def get_or_build_article
     @article = case params[:id]
-               when nil
-                 returning(this_blog.articles.build) do |art|
-                   art.allow_comments = this_blog.default_allow_comments
-                   art.allow_pings    = this_blog.default_allow_pings
-                   art.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
-                 end
-               else
-                 this_blog.articles.find(params[:id])
-               end
+             when nil
+               this_blog.articles.build.tap do |art|
+                 art.allow_comments = this_blog.default_allow_comments
+                 art.allow_pings    = this_blog.default_allow_pings
+                 art.text_filter    = (current_user.editor == 'simple') ? current_user.text_filter : 1
+             else
+               this_blog.articles.find(params[:id])
+             end
   end
 
   def setup_resources

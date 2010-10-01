@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe Article do
 
@@ -42,12 +42,16 @@ describe Article do
     assert_equal [:body, :extended], a.content_fields
   end
 
-  it "test_permalink_url with hostname" do
-    assert_equal 'http://myblog.net/2004/06/01/article-3', contents(:article3).permalink_url(anchor=nil, only_path=false)
-  end
+  describe "#permalink_url" do
+    describe "with hostname" do
+      subject { contents(:article3).permalink_url(anchor=nil, only_path=false) }
+      it { should == 'http://myblog.net/2004/06/01/article-3' }
+    end
 
-  it "test_permalink_url only path" do
-    assert_equal '/2004/06/01/article-3', contents(:article3).permalink_url(anchor=nil, only_path=true)
+    describe "without hostname" do
+      subject { contents(:article3).permalink_url(anchor=nil, only_path=true) }
+      it { should == '/2004/06/01/article-3' }
+    end
   end
 
   it "test_edit_url" do
@@ -395,19 +399,11 @@ describe Article do
 
   describe '#search' do
 
-    describe 'is an array', :shared => true do
-      it 'should get an array' do
-        @articles.should be_a(Array)
-      end
-    end
-
     describe 'with several words and no result' do
 
       before :each do
         @articles = Article.search('hello world')
       end
-
-      it_should_behave_like 'is an array'
 
       it 'should be empty' do
         @articles.should be_empty
@@ -420,9 +416,7 @@ describe Article do
         @articles = Article.search('extended')
       end
 
-      it_should_behave_like 'is an array'
-
-      it 'should have one item' do
+      it 'should have ten items' do
         assert_equal 10, @articles.size
       end
     end
