@@ -47,6 +47,7 @@ class Admin::ContentController < Admin::BaseController
 
     if request.post?
       @article.destroy
+      flash[:notice] = _("This article was deleted successfully")
       redirect_to :action => 'index'
       return
     end
@@ -110,7 +111,7 @@ class Admin::ContentController < Admin::BaseController
     @article.state = "draft" unless @article.state == "withdrawn"
     if @article.save
       render(:update) do |page|
-        page.replace_html('autosave', hidden_field_tag('id', @article.id))
+        page.replace_html('autosave', hidden_field_tag('article[id]', @article.id))
         page.replace_html('permalink', text_field('article', 'permalink', {:class => 'small medium'}))
         page.replace_html('preview_link', link_to(_("Preview"), {:controller => '/articles', :action => 'preview', :id => @article.id}, {:target => 'new'}))
       end
@@ -215,6 +216,8 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def get_or_build_article
+    params[:id] = params[:article][:id] if params[:article] and params[:article][:id]
+    
     @article = case params[:id]
              when nil
                this_blog.articles.build.tap do |art|

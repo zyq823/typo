@@ -26,7 +26,7 @@ describe Admin::FeedbackController do
       lambda do
         Feedback.find(feedback_from_own_article.id)
       end.should_not raise_error(ActiveRecord::RecordNotFound)
-      response.should redirect_to(:controller => 'admin/feedback', :action => 'article', :id => feedback_from_own_article.article.id)
+      response.should render_template 'destroy'
     end
   end
 
@@ -91,6 +91,18 @@ describe Admin::FeedbackController do
         get :index, :published => 'f', :confirmed => 'f'
         should_success_with_index(response)
         Feedback.count(:conditions => { :published => false, :status_confirmed => false }).should == assigns(:feedback).size
+      end
+
+      it 'should view presumed_spam' do
+        get :index, :presumed_spam => 'f'
+        should_success_with_index(response)
+        Feedback.count(:conditions => { :state => 'presumed_spam' }).should == assigns(:feedback).size
+      end
+
+      it 'should view presumed_ham' do
+        get :index, :presumed_spam => 'f'
+        should_success_with_index(response)
+        Feedback.count(:conditions => { :state => 'presumed_ham' }).should == assigns(:feedback).size
       end
 
       it 'should get page 1 if page params empty' do

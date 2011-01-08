@@ -18,7 +18,7 @@ module ApplicationHelper
     class_attr = "class=\"#{h style}\"" if style
     rel_attr = "rel=\"nofollow\"" if nofollow
 
-    "<a href=\"#{h item.permalink_url(anchor)}\" #{rel_attr} #{class_attr}>#{h title}</a>".html_safe
+    "<a href=\"#{h item.permalink_url(anchor)}\" #{rel_attr} #{class_attr}>#{h title.html_safe}</a>".html_safe
   end
 
   # The '5 comments' link from the bottom of articles
@@ -27,6 +27,16 @@ module ApplicationHelper
     # FIXME Why using own pluralize metchod when the Localize._ provides the same funciotnality, but better? (by simply calling _('%d comments', comment_count) and using the en translation: l.store "%d comments", ["No nomments", "1 comment", "%d comments"])
     link_to_permalink(article,pluralize(comment_count, _('no comments'), _('1 comment'), _('%d comments', comment_count)),'comments')
   end
+
+  # wrapper for TypoPlugins::Avatar
+  # options is a hash which should contain :email and :url for the plugin
+  # (gravatar will use :email, pavatar will use :url, etc.)
+  def avatar_tag(options = {})
+    avatar_class = this_blog.plugin_avatar.constantize
+    return '' unless avatar_class.respond_to?(:get_avatar)
+    avatar_class.get_avatar(options)
+  end
+
 
   def trackbacks_link(article)
     trackbacks_count = article.published_trackbacks.size

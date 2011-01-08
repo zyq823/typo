@@ -68,6 +68,13 @@ module Admin::BaseHelper
     end
   end
 
+  def plugin_options(kind, blank = true)
+    r = TypoPlugins::Keeper.available_plugins(kind).collect do |plugin|
+      [ plugin.name, plugin.to_s ]
+    end
+    blank ? r << [_("none"),''] : r
+  end
+
   def alternate_class
     @class = @class != '' ? '' : 'class="shade"'
   end
@@ -225,9 +232,10 @@ module Admin::BaseHelper
   def build_editor_link(label, action, id, update, editor)
     link = link_to_remote(label,
             :url => { :action => action, 'editor' => editor},
+            :class => 'ui-button-text',
             :loading => "new Element.show('update_spinner_#{id}')",
             :success => "new Element.toggle('update_spinner_#{id}')",
-            :update => "#{update}")
+            :update => "#{update}")      
     link << image_tag("spinner-blue.gif", :id => "update_spinner_#{id}", :style => 'display:none;')
   end
 
